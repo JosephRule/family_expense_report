@@ -1,0 +1,38 @@
+# Report configuration settings
+
+report_settings:
+  # Number of top items to show in reports
+  top_n_categories: 10
+  top_n_merchants: 15
+  top_n_transactions: 20
+  
+  # Minimum amount thresholds for reports
+  min_transaction_amount: 10.0  # Only show transactions >= this amount
+  min_category_total: 50.0      # Only show categories with total >= this amount
+  
+  # Account groupings for reporting
+  account_groups:
+    shared: ["chase_checking", "chase_credit_card"]
+    joe: ["apple_card_joe"]
+    nikita: ["apple_card_nikita"]
+    all: ["chase_checking", "chase_credit_card", "apple_card_joe", "apple_card_nikita"]
+
+# Output file settings
+output_settings:
+  # Whether to generate intermediate CSV files
+  save_intermediate: true
+  
+  # Output file names
+  files:
+    processed_transactions: "processed_transactions.csv"
+    category_summary: "category_summary.csv"
+    merchant_summary: "merchant_summary.csv"
+    cashflow_summary: "cashflow_summary.csv"
+    top_expenses: "top_expenses.csv"
+  
+  # Date format for output files
+  date_format: "%Y-%m-%d"
+  
+  # Decimal places for amounts
+  amount_precision: 2
+  

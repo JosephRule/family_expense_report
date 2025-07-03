@@ -1,0 +1,37 @@
+# Master category mapping from source categories
+master_categories:
+  # Apple Card categories
+  Payment: "Payments"
+  Other: "Other"
+  Restaurants: "Food & Dining"
+  Grocery: "Groceries"
+  Hotels: "Travel"
+  Entertainment: "Entertainment"
+  Utilities: "Bills & Utilities"
+  Installment: "Debt Payments"
+  
+  # Chase Credit Card categories
+  Shopping: "Shopping"
+  "Food & Drink": "Food & Dining"
+  Travel: "Travel"
+  Groceries: "Groceries"
+  Gas: "Transportation"
+  "Health & Wellness": "Health & Wellness"
+  Home: "Home & Garden"
+  "Bills & Utilities": "Bills & Utilities"
+  Personal: "Personal Care"
+  "Gifts & Donations": "Gifts & Donations"
+  
+  # Chase Checking types (used as categories)
+  LOAN_PMT: "Debt Payments"
+  ACH_CREDIT: "Income"
+  ACH_DEBIT: "Bills & Utilities"
+  ATM: "Cash Withdrawals"
+  FEE_TRANSACTION: "Bank Fees"
+  CHECK_PAID: "Other Payments"
+  MISC_DEBIT: "Other"
+  DEBIT_CARD: "Debit Purchases"
+  QUICKPAY_DEBIT: "Transfers"
+
+# Default category for unmapped items
+default_category: "Uncategorized"
