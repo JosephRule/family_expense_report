@@ -2,6 +2,8 @@
 master_categories:
   # Apple Card categories
   Payment: "Payments"
+  Credit: "Income"
+  Debit: "Other"
   Other: "Other"
   Restaurants: "Food & Dining"
   Grocery: "Groceries"
@@ -9,9 +11,9 @@ master_categories:
   Entertainment: "Entertainment"
   Utilities: "Bills & Utilities"
   Installment: "Debt Payments"
+  Shopping: "Shopping"
   
   # Chase Credit Card categories
-  Shopping: "Shopping"
   "Food & Drink": "Food & Dining"
   Travel: "Travel"
   Groceries: "Groceries"
@@ -22,7 +24,7 @@ master_categories:
   Personal: "Personal Care"
   "Gifts & Donations": "Gifts & Donations"
   
-  # Chase Checking types (used as categories)
+  # Chase Checking types (used as categories) - Note: Chase checking category is NA
   LOAN_PMT: "Debt Payments"
   ACH_CREDIT: "Income"
   ACH_DEBIT: "Bills & Utilities"

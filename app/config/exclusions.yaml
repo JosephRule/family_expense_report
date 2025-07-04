@@ -1,44 +1,31 @@
 # Transaction exclusion rules
 # Transactions matching these patterns will be excluded from analysis
+# Source IDs must match those defined in app/constants.py:
+#   - chase_checking
+#   - chase_credit_card  
+#   - apple_card_joe
+#   - apple_card_nikita
 
 exclusions:
-  # Credit card payments (to avoid double counting)
-  - source: "chase_checking"
-    field: "description"
-    pattern: "Payment to Chase card"
-    reason: "Credit card payment - avoid double counting"
-  
+  # Card payments (to avoid double counting transfers between accounts)
   - source: "apple_card_joe"
     type: "Payment"
-    reason: "Credit card payment"
+    reason: "Credit card payment - avoid double counting"
     
   - source: "apple_card_nikita" 
     type: "Payment"
-    reason: "Credit card payment"
+    reason: "Credit card payment - avoid double counting"
     
   - source: "chase_credit_card"
     type: "Payment"
-    reason: "Credit card payment"
-  
-  # Bank fees (optional - can be included if you want to track them)
-  - source: "chase_checking"
-    type: "FEE_TRANSACTION"
-    reason: "Bank fees - can be excluded or included based on preference"
-    enabled: false  # Set to true to exclude
-  
-  # Internal transfers between accounts (if any)
-  - source: "chase_checking"
-    field: "description"
-    pattern: "QUICKPAY"
-    reason: "Internal transfer"
-    enabled: false  # Set to true to exclude
+    reason: "Credit card payment - avoid double counting"
 
-# Global exclusion patterns (apply to all sources)
-global_exclusions:
-  # Exclude very small amounts (less than $1)
-  - field: "amount"
-    condition: "abs_less_than"
-    value: 1.0
-    reason: "Small amounts under $1"
-    enabled: false  # Set to true to exclude
+  # Checking account payments to cards (to avoid double counting)
+  - source: "chase_checking"
+    description_contains: "Payment to Chase card ending in 4754"
+    reason: "Payment to Chase credit card - avoid double counting"
+    
+  - source: "chase_checking"
+    description_contains: "APPLECARD GSBANK PAYMENT"
+    reason: "Payment to Apple Card - avoid double counting"
     

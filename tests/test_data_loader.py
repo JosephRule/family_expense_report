@@ -27,14 +27,15 @@ class TestDataLoaders(unittest.TestCase):
     
     def create_test_files(self):
         """Create test CSV files."""
-        # Chase checking test data
+        # Chase checking test data (columns are shifted in real CSV)
+        # Details=date, Posting Date=description, Description=amount, Amount=type, Type=balance
         checking_data = {
-            'Details': ['DEBIT', 'CREDIT'],
-            'Posting Date': ['06/30/2025', '06/29/2025'],
-            'Description': ['ATM WITHDRAWAL', 'SALARY DEPOSIT'],
-            'Amount': [-100.0, 5000.0],
-            'Type': ['ATM', 'ACH_CREDIT'],
-            'Balance': [4900.0, 5000.0],
+            'Details': ['06/30/2025', '06/29/2025'],  # This contains the actual dates
+            'Posting Date': ['ATM WITHDRAWAL', 'SALARY DEPOSIT'],  # This contains descriptions
+            'Description': [-100.0, 5000.0],  # This contains amounts
+            'Amount': ['ATM', 'ACH_CREDIT'],  # This contains transaction types
+            'Type': [4900.0, 5000.0],  # This contains balances
+            'Balance': ['', ''],
             'Check or Slip #': ['', '']
         }
         checking_df = pd.DataFrame(checking_data)
@@ -87,6 +88,12 @@ class TestDataLoaders(unittest.TestCase):
         self.assertEqual(df['source'].iloc[0], 'chase_checking')
         self.assertEqual(df['account_owner'].iloc[0], 'shared')
         self.assertTrue(df['category'].isna().all())  # Chase checking has no category
+        
+        # Test correct mapping of shifted columns
+        self.assertEqual(df['merchant'].iloc[0], 'ATM WITHDRAWAL')  # From Posting Date column
+        self.assertEqual(df['amount'].iloc[0], -100.0)  # From Description column
+        self.assertEqual(df['type'].iloc[0], 'ATM')  # From Amount column
+        self.assertEqual(str(df['date'].iloc[0].date()), '2025-06-30')  # From Details column
     
     def test_chase_credit_loader(self):
         """Test Chase credit card loader."""

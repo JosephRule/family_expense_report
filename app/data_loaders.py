@@ -5,6 +5,7 @@ import pandas as pd
 from pathlib import Path
 from typing import List, Dict, Any
 from abc import ABC, abstractmethod
+from .constants import SourceIds, AccountOwners, SourceFolders
 
 
 class DataLoader(ABC):
@@ -20,13 +21,13 @@ class DataLoader(ABC):
     
     def _load_csv_files(self) -> pd.DataFrame:
         """Load and concatenate all CSV files in folder."""
-        csv_files = list(self.folder_path.glob("*.csv"))
+        csv_files = list(self.folder_path.glob("*.csv")) + list(self.folder_path.glob("*.CSV"))
         if not csv_files:
             raise FileNotFoundError(f"No CSV files found in {self.folder_path}")
         
         dfs = []
         for file in csv_files:
-            df = pd.read_csv(file)
+            df = pd.read_csv(file, dtype=str)  # Load all columns as strings to avoid parsing issues
             df['source_file'] = file.name
             dfs.append(df)
         
@@ -39,15 +40,15 @@ class ChaseCheckingLoader(DataLoader):
     def load_data(self) -> pd.DataFrame:
         df = self._load_csv_files()
         
-        # Standardize columns to common schema
+        # CSV columns are shifted: Details=date, Posting Date=description, Description=amount, Amount=type, Type=balance
         df_std = pd.DataFrame({
-            'date': pd.to_datetime(df['Posting Date']),
-            'merchant': df['Description'],
-            'type': df['Type'],
+            'date': pd.to_datetime(df['Details'], format='%m/%d/%Y'),
+            'merchant': df['Posting Date'],
+            'type': df['Amount'],
             'category': pd.NA,  # Chase checking doesn't have category
-            'amount': df['Amount'],
-            'source': 'chase_checking',
-            'account_owner': 'shared',
+            'amount': pd.to_numeric(df['Description']),
+            'source': SourceIds.CHASE_CHECKING,
+            'account_owner': AccountOwners.SHARED,
             'source_file': df['source_file']
         })
         
@@ -62,13 +63,13 @@ class ChaseCreditCardLoader(DataLoader):
         
         # Standardize columns to common schema
         df_std = pd.DataFrame({
-            'date': pd.to_datetime(df['Transaction Date']),
+            'date': pd.to_datetime(df['Transaction Date'], format='%m/%d/%Y'),
             'merchant': df['Description'],
             'type': df['Type'],
             'category': df['Category'],
-            'amount': df['Amount'],
-            'source': 'chase_credit_card',
-            'account_owner': 'shared',
+            'amount': pd.to_numeric(df['Amount']),
+            'source': SourceIds.CHASE_CREDIT_CARD,
+            'account_owner': AccountOwners.SHARED,
             'source_file': df['source_file']
         })
         
@@ -87,12 +88,12 @@ class AppleCardLoader(DataLoader):
         
         # Standardize columns to common schema
         df_std = pd.DataFrame({
-            'date': pd.to_datetime(df['Transaction Date']),
+            'date': pd.to_datetime(df['Transaction Date'], format='%m/%d/%Y'),
             'merchant': df['Description'],
             'type': df['Type'],
             'category': df['Category'],
-            'amount': df['Amount (USD)'],
-            'source': f'apple_card_{self.owner.lower()}',
+            'amount': pd.to_numeric(df['Amount (USD)']),
+            'source': SourceIds.apple_card_for_owner(self.owner),
             'account_owner': self.owner.lower(),
             'source_file': df['source_file']
         })
@@ -105,10 +106,10 @@ def load_all_data(data_folder: str) -> pd.DataFrame:
     data_path = Path(data_folder)
     
     loaders = [
-        ChaseCheckingLoader(data_path / "chase_checking"),
-        ChaseCreditCardLoader(data_path / "chase_card"),
-        AppleCardLoader(data_path / "joe_apple_card", "Joe"),
-        AppleCardLoader(data_path / "nikita_apple_card", "Nikita")
+        ChaseCheckingLoader(data_path / SourceFolders.CHASE_CHECKING),
+        ChaseCreditCardLoader(data_path / SourceFolders.CHASE_CREDIT_CARD),
+        AppleCardLoader(data_path / SourceFolders.JOE_APPLE_CARD, "Joe"),
+        AppleCardLoader(data_path / SourceFolders.NIKITA_APPLE_CARD, "Nikita")
     ]
     
     all_data = []
