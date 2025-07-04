@@ -92,7 +92,7 @@ class AppleCardLoader(DataLoader):
             'merchant': df['Description'],
             'type': df['Type'],
             'category': df['Category'],
-            'amount': pd.to_numeric(df['Amount (USD)']),
+            'amount': -pd.to_numeric(df['Amount (USD)']),  # Flip sign to make purchases negative
             'source': SourceIds.apple_card_for_owner(self.owner),
             'account_owner': self.owner.lower(),
             'source_file': df['source_file']

@@ -63,9 +63,7 @@ class RulesEngine:
         """Apply custom categorization rules."""
         result_df = df.copy()
 
-        # Initialize custom fields
-        result_df['custom_category'] = pd.NA
-        result_df['flags'] = ''
+        # Custom rules will override categories directly
 
         custom_rules = self.custom_rules.get('custom_rules', [])
 
@@ -100,10 +98,8 @@ class RulesEngine:
                 actions = rule.get('action', {})
 
                 if 'category' in actions:
-                    result_df.loc[mask, 'custom_category'] = actions['category']
+                    result_df.loc[mask, 'category'] = actions['category']
 
-                if 'flag' in actions:
-                    result_df.loc[mask, 'flags'] = actions['flag']
 
                 matched_count = mask.sum()
                 print(f"Applied rule '{rule.get('name', 'Unknown')}' to {matched_count} transactions")
@@ -119,24 +115,10 @@ class RulesEngine:
 
         master_categories = self.category_mapping.get('master_categories', {})
 
-        # Apply mappings based on custom_category first (if exists), then original category
+        # Apply mappings based on category
         for orig_category, master_category in master_categories.items():
-            # Check custom category first
-            if 'custom_category' in result_df.columns:
-                custom_mask = (result_df['custom_category'] == orig_category)
-                result_df.loc[custom_mask, 'master_category'] = master_category
-
-            # Then check original category
             orig_mask = (result_df['category'] == orig_category)
-            # Only apply if custom category hasn't already been set
-            if 'custom_category' in result_df.columns:
-                orig_mask &= result_df['custom_category'].isna()
             result_df.loc[orig_mask, 'master_category'] = master_category
-
-        # Handle custom categories that aren't in the mapping - use custom_category as master_category
-        if 'custom_category' in result_df.columns:
-            custom_not_mapped = (~result_df['custom_category'].isna()) & (~result_df['custom_category'].isin(master_categories.keys()))
-            result_df.loc[custom_not_mapped, 'master_category'] = result_df.loc[custom_not_mapped, 'custom_category']
 
         return result_df
 

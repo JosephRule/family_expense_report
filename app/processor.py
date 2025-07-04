@@ -23,7 +23,7 @@ class ExpenseProcessor:
         self.reports_folder.mkdir(parents=True, exist_ok=True)
 
         # Load configuration
-        self.report_config = self._load_config("report_config.yaml")
+        self.report_config = self._load_config("report.yaml")
         self.rules_engine = RulesEngine(config_folder)
 
     def _load_config(self, filename: str) -> Dict[str, Any]:
@@ -81,7 +81,6 @@ class ExpenseProcessor:
         # Add month, year for time-based analysis
         result_df['year'] = result_df['date'].dt.year
         result_df['month'] = result_df['date'].dt.month
-        result_df['year_month'] = result_df['date'].dt.to_period('M')
 
         # Add absolute amount for sorting
         result_df['abs_amount'] = result_df['amount'].abs()
@@ -190,5 +189,5 @@ class ExpenseProcessor:
         expenses = df[df['amount'] < 0].copy()
         expenses = expenses.sort_values('abs_amount', ascending=False)
 
-        return expenses.head(n)[['date', 'description', 'merchant_group', 'master_category',
-                                'amount', 'account_group', 'source', 'flags']]
+        return expenses.head(n)[['date', 'merchant_group', 'master_category',
+                                'amount', 'account_group', 'source']]

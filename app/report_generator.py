@@ -62,7 +62,7 @@ class ReportGenerator:
     def _print_top_expenses(self, top_expenses_df: pd.DataFrame, n: int = 10) -> None:
         """Print top expenses to console."""
         print(f"\n--- TOP {n} EXPENSES ---")
-        display_df = top_expenses_df.head(n)[['date', 'description', 'amount', 'master_category', 'account_group']]
+        display_df = top_expenses_df.head(n)[['date', 'merchant_group', 'amount', 'master_category', 'account_group']]
         print(display_df.to_string(index=False))
     
     def _generate_category_reports(self, df: pd.DataFrame) -> None:
@@ -119,9 +119,12 @@ class ReportGenerator:
                 continue
             
             # Merchant summary for expenses only, above minimum amount
+            # Exclude fixed/structural categories: Housing, Debt, Childcare, Savings
+            excluded_categories = ['Home & Garden', 'Debt Payments', 'Childcare', 'Savings']
             expenses = group_df[
                 (group_df['amount'] < 0) & 
-                (group_df['abs_amount'] >= min_amount)
+                (group_df['abs_amount'] >= min_amount) &
+                (~group_df['master_category'].isin(excluded_categories))
             ].copy()
             
             if len(expenses) > 0:
@@ -140,15 +143,20 @@ class ReportGenerator:
                 self._save_report(merchant_summary.head(top_n), filename)
                 
                 # Print summary
-                print(f"\n--- TOP MERCHANTS: {group_name.upper()} ---")
+                print(f"\n--- TOP DISCRETIONARY MERCHANTS: {group_name.upper()} ---")
+                print("(Excludes: Housing, Debt Payments, Childcare, Savings)")
                 display_df = merchant_summary.head(10)[['merchant_group', 'total_spent', 'transaction_count']]
                 display_df.columns = ['Merchant', 'Total_Spent', 'Transactions']
                 print(display_df.to_string(index=False))
     
     def _generate_monthly_reports(self, df: pd.DataFrame) -> None:
         """Generate monthly trend reports."""
+        # Create year_month on the fly
+        df_monthly = df.copy()
+        df_monthly['year_month'] = df_monthly['date'].dt.to_period('M')
+        
         # Monthly spending by category
-        monthly_categories = df[df['amount'] < 0].groupby(['year_month', 'master_category']).agg({
+        monthly_categories = df_monthly[df_monthly['amount'] < 0].groupby(['year_month', 'master_category']).agg({
             'amount': 'sum',
             'abs_amount': 'sum'
         }).round(2)
@@ -157,7 +165,7 @@ class ReportGenerator:
         self._save_report(monthly_categories, "monthly_spending_by_category.csv")
         
         # Monthly totals by account group
-        monthly_totals = df.groupby(['year_month', 'account_group', 'transaction_type']).agg({
+        monthly_totals = df_monthly.groupby(['year_month', 'account_group', 'transaction_type']).agg({
             'amount': 'sum'
         }).round(2)
         
@@ -165,7 +173,7 @@ class ReportGenerator:
         self._save_report(monthly_totals, "monthly_totals_by_account.csv")
         
         # Overall monthly summary
-        monthly_summary = df.groupby(['year_month', 'transaction_type']).agg({
+        monthly_summary = df_monthly.groupby(['year_month', 'transaction_type']).agg({
             'amount': 'sum'
         }).round(2)
         

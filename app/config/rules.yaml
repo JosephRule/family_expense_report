@@ -4,104 +4,103 @@
 custom_rules:
   # Income identification
   - name: "Salary Income - Clockwise"
-    source: "chase_checking"
     conditions:
+      source: "chase_checking"
       type: "ACH_CREDIT"
       description_contains: "CLOCKWISE"
     action:
       category: "Salary Income"
-      flag: "primary_income"
-      
+
   - name: "Salary Income - PagerDuty"
-    source: "chase_checking"
     conditions:
+      source: "chase_checking"
       type: "ACH_CREDIT"
       description_contains: "PAGERDUTY"
     action:
       category: "Salary Income"
-      flag: "primary_income"
-  
+
   # Debt payments
   - name: "Large Check Payment (Debt)"
-    source: "chase_checking"
     conditions:
+      source: "chase_checking"
       type: "CHECK_PAID"
-      amount_greater_than: 900
+      amount_max: -999
     action:
       category: "Debt Payments"
-      flag: "large_debt_payment"
-  
+
   # Childcare payments (ATM withdrawals)
   - name: "Childcare ATM Withdrawal"
-    source: "chase_checking"
     conditions:
+      source: "chase_checking"
       type: "ATM"
-      amount_less_than: -700  # Large ATM withdrawal
+      amount_max: -700  # Large ATM withdrawal
     action:
       category: "Childcare"
-      flag: "childcare_payment"
-  
+
   # Housing costs
   - name: "Mortgage Payment"
-    source: "chase_checking"
     conditions:
+      source: "chase_checking"
       description_contains: "ROCKET MORTGAGE"
     action:
       category: "Housing"
-      flag: "mortgage"
-      
+
   - name: "HOA/Condo Fees"
-    source: "chase_checking"
     conditions:
+      source: "chase_checking"
       description_contains: "DEARBORN PARK"
     action:
       category: "Housing"
-      flag: "hoa_fees"
-  
+
   # Utilities
   - name: "Electric Bill"
-    source: "chase_checking"
     conditions:
+      source: "chase_checking"
       description_contains: "ComEd"
     action:
       category: "Bills & Utilities"
-      flag: "electric"
-      
+
   - name: "Gas Bill"
-    source: "chase_checking" 
     conditions:
+      source: "chase_checking"
       description_contains: "PEOPLES GAS"
     action:
       category: "Bills & Utilities"
-      flag: "gas"
-  
+
   # Auto loan
   - name: "Auto Loan Payment"
-    source: "chase_checking"
     conditions:
+      source: "chase_checking"
       description_contains: "Auto Loan"
     action:
       category: "Transportation"
-      flag: "auto_loan"
+
+  # Savings/Investment transfers
+  - name: "Wealthfront Savings Transfer"
+    conditions:
+      source: "chase_checking"
+      description_contains: "Wealthfront      EDI PYMNTS"
+    action:
+      category: "Savings"
 
 # Merchant grouping rules (for combining similar merchants)
 merchant_groups:
   "Amazon":
-    patterns: ["AMAZON", "AMZN"]
+    patterns: ["AMAZON", "AMZN", "WHOLEFDS"]
     master_name: "Amazon"
-    
+
   "Apple Services":
     patterns: ["APPLE.COM", "APPLE SERVICES"]
     master_name: "Apple"
-    
+
   "Uber":
     patterns: ["UBER", "UBER EATS"]
     master_name: "Uber"
-    
+
   "Starbucks":
     patterns: ["STARBUCKS", "SBX"]
     master_name: "Starbucks"
-    
+
   "Target":
     patterns: ["TARGET", "TGT"]
     master_name: "Target"

@@ -34,6 +34,14 @@ master_categories:
   MISC_DEBIT: "Other"
   DEBIT_CARD: "Debit Purchases"
   QUICKPAY_DEBIT: "Transfers"
+  
+  # Custom categories from rules.yaml
+  "Salary Income": "Income"
+  "Debt Payments": "Debt Payments"
+  "Childcare": "Childcare"
+  "Housing": "Home & Garden"
+  "Transportation": "Transportation"
+  "Savings": "Savings"
 
 # Default category for unmapped items
 default_category: "Uncategorized"
