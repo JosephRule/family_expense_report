@@ -79,10 +79,14 @@ class TestDataLoaders(unittest.TestCase):
         
         self.assertEqual(len(df), 2)
         self.assertTrue('date' in df.columns)
+        self.assertTrue('merchant' in df.columns)
+        self.assertTrue('type' in df.columns)
+        self.assertTrue('category' in df.columns)
         self.assertTrue('amount' in df.columns)
         self.assertTrue('source' in df.columns)
         self.assertEqual(df['source'].iloc[0], 'chase_checking')
         self.assertEqual(df['account_owner'].iloc[0], 'shared')
+        self.assertTrue(df['category'].isna().all())  # Chase checking has no category
     
     def test_chase_credit_loader(self):
         """Test Chase credit card loader."""
@@ -90,7 +94,11 @@ class TestDataLoaders(unittest.TestCase):
         df = loader.load_data()
         
         self.assertEqual(len(df), 2)
+        self.assertTrue('date' in df.columns)
+        self.assertTrue('merchant' in df.columns)
+        self.assertTrue('type' in df.columns)
         self.assertTrue('category' in df.columns)
+        self.assertTrue('amount' in df.columns)
         self.assertEqual(df['source'].iloc[0], 'chase_credit_card')
         self.assertEqual(df['account_owner'].iloc[0], 'shared')
     
@@ -100,7 +108,11 @@ class TestDataLoaders(unittest.TestCase):
         df = loader.load_data()
         
         self.assertEqual(len(df), 2)
+        self.assertTrue('date' in df.columns)
         self.assertTrue('merchant' in df.columns)
+        self.assertTrue('type' in df.columns)
+        self.assertTrue('category' in df.columns)
+        self.assertTrue('amount' in df.columns)
         self.assertEqual(df['source'].iloc[0], 'apple_card_joe')
         self.assertEqual(df['account_owner'].iloc[0], 'joe')
     

@@ -39,16 +39,15 @@ class ChaseCheckingLoader(DataLoader):
     def load_data(self) -> pd.DataFrame:
         df = self._load_csv_files()
         
-        # Standardize columns
+        # Standardize columns to common schema
         df_std = pd.DataFrame({
             'date': pd.to_datetime(df['Posting Date']),
-            'description': df['Description'],
-            'amount': df['Amount'],
-            'category': df['Type'],  # Using Type as category for checking
+            'merchant': df['Description'],
             'type': df['Type'],
+            'category': pd.NA,  # Chase checking doesn't have category
+            'amount': df['Amount'],
             'source': 'chase_checking',
             'account_owner': 'shared',
-            'merchant': df['Description'],  # Use description as merchant
             'source_file': df['source_file']
         })
         
@@ -61,16 +60,15 @@ class ChaseCreditCardLoader(DataLoader):
     def load_data(self) -> pd.DataFrame:
         df = self._load_csv_files()
         
-        # Standardize columns
+        # Standardize columns to common schema
         df_std = pd.DataFrame({
             'date': pd.to_datetime(df['Transaction Date']),
-            'description': df['Description'],
-            'amount': df['Amount'],
-            'category': df['Category'],
+            'merchant': df['Description'],
             'type': df['Type'],
+            'category': df['Category'],
+            'amount': df['Amount'],
             'source': 'chase_credit_card',
             'account_owner': 'shared',
-            'merchant': df['Description'],  # Use description as merchant
             'source_file': df['source_file']
         })
         
@@ -87,16 +85,15 @@ class AppleCardLoader(DataLoader):
     def load_data(self) -> pd.DataFrame:
         df = self._load_csv_files()
         
-        # Standardize columns
+        # Standardize columns to common schema
         df_std = pd.DataFrame({
             'date': pd.to_datetime(df['Transaction Date']),
-            'description': df['Description'],
-            'amount': df['Amount (USD)'],
-            'category': df['Category'],
+            'merchant': df['Description'],
             'type': df['Type'],
+            'category': df['Category'],
+            'amount': df['Amount (USD)'],
             'source': f'apple_card_{self.owner.lower()}',
             'account_owner': self.owner.lower(),
-            'merchant': df['Merchant'],
             'source_file': df['source_file']
         })
         
@@ -109,9 +106,9 @@ def load_all_data(data_folder: str) -> pd.DataFrame:
     
     loaders = [
         ChaseCheckingLoader(data_path / "chase_checking"),
-        ChaseCreditCardLoader(data_path / "chase_credit_card"),
-        AppleCardLoader(data_path / "joe_apple_credit_card", "Joe"),
-        AppleCardLoader(data_path / "nikita_apple_credit_card", "Nikita")
+        ChaseCreditCardLoader(data_path / "chase_card"),
+        AppleCardLoader(data_path / "joe_apple_card", "Joe"),
+        AppleCardLoader(data_path / "nikita_apple_card", "Nikita")
     ]
     
     all_data = []
